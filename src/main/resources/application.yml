@@ -1,0 +1,30 @@
+server:
+  port: 8080
+
+spring:
+  profiles:
+    active: dev
+  main:
+    allow-circular-references: true
+
+  datasource:
+    druid:
+      driver-class-name: ${vibe.datasource.driver-class-name}
+      url: jdbc:mysql://${vibe.datasource.host}:${vibe.datasource.port}/${vibe.datasource.database}?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+      username: ${vibe.datasource.username}
+      password: ${vibe.datasource.password}
+
+    redis:
+      host: ${vibe.redis.host}
+      port: ${vibe.redis.port}
+      database: ${vibe.redis.database}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+
