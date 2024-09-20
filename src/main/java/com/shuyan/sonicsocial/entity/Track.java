@@ -1,16 +1,17 @@
 package com.shuyan.sonicsocial.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.stereotype.Indexed;
 
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Builder
 @Data
+@AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "tracks")
 public class Track {
@@ -19,31 +20,29 @@ public class Track {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String trackId;
+    @Column(nullable = false, unique = true)
+    private Long trackId;
 
     private String name;
 
     private String artist;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
-
-    @ElementCollection
-    private List<String> mostFrequentGenres;
+    private double danceability;
 
     private double energy;
 
-    private double danceability;
+    private double  tempo;
 
-    private String genres;
+    private double  acousticness;
 
-    @ElementCollection
-    private List<String> favoriteArtists;
+    private double  instrumentalness;
 
-    private double tempo;
+    private double  liveness;
 
-    private LocalDateTime lastUpdated;
+    private double  loudness;
+
+    private double speechiness;
+
 
     public Track(String trackId, String name, String artist) {
     }

@@ -1,4 +1,4 @@
-vibe:
+sonic:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     host: localhost
@@ -11,3 +11,7 @@ vibe:
     host: localhost
     port: 6379
     database: 3
+
+  google:
+    recaptcha:
+      secret: 6LcPNUIqAAAAAONs7gNU0Q4PavtCBTIAYuRamXk9

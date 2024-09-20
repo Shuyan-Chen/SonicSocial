@@ -1,71 +1,38 @@
 package com.shuyan.sonicsocial.service.impl;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.shuyan.Captcha;
-import com.shuyan.exception.BaseException;
-import com.shuyan.service.CaptchaService;
-import com.shuyan.utils.CaptchaProducer;
+import com.shuyan.sonicsocial.service.CaptchaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
-import java.awt.image.BufferedImage;
-import java.time.LocalDateTime;
-import java.util.concurrent.TimeUnit;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Service
 public class CaptchaServiceImpl implements CaptchaService {
 
+    @Value("${google.recaptcha.secret}")
+    private String recaptchaSecret;
 
-    @Autowired
-    private CaptchaProducer captchaProducer;
+    private final static String RECAPTCHA_VERIFY_URL = "https://www.google.com/recaptcha/api/siteverify";
 
-    @Autowired
-    private RedisTemplate redisTemplate;
+    @Override
+    public boolean verifyCaptcha(String recaptchaResponse) {
+        RestTemplate restTemplate = new RestTemplate();
+        HashMap<Object, Object> body = new HashMap<>();
+        body.put("secret", recaptchaSecret);
+        body.put("response", recaptchaResponse);
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+        ResponseEntity<Map> recaptchResponseEntity = restTemplate.postForEntity(RECAPTCHA_VERIFY_URL, body, Map.class);
+        Map<String, Object> responseBody = recaptchResponseEntity.getBody();
+        Boolean success = (Boolean) responseBody.get("success");
 
-
-    public BufferedImage getCaptcha(String uuId) {
-        String code = captchaProducer.createText(6);
-        Captcha captcha = new Captcha();
-        captcha.setUuid(uuId);
-        captcha.setCode(code);
-        captcha.setExpireTime(DateUtil.convertToDate(LocalDateTime.now().plusMinutes(5)));
-        try {
-            String captchaJson = objectMapper.writeValueAsString(captcha);
-            redisTemplate.opsForValue().set("captcha:" + uuId, captchaJson, 5, TimeUnit.MINUTES);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return captchaProducer.createImage(code);
+        return success != null && success;
     }
-
-
-    public boolean validate(Captcha captcha) {
-
-        String captchaJson = (String) redisTemplate.opsForValue().get("captcha:" + captcha.getUuid());
-        if (captchaJson == null) {
-            throw new BaseException("验证码已过期或不存在");
-        }
-
-        try {
-            Captcha storedCaptcha = objectMapper.readValue(captchaJson, Captcha.class);
-            if (!storedCaptcha.getCode().equals(captcha.getCode())) {
-                throw new BaseException("验证码错误");
-            }
-            if (storedCaptcha.getExpireTime().getTime() <= System.currentTimeMillis()) {
-                throw new BaseException("验证码已过期");
-            }
-            redisTemplate.delete("captcha:" + captcha.getUuid());
-        } catch (Exception e) {
-            throw new BaseException("验证码验证失败" + e.getMessage());
-        }
-        return true;
-     }
-
-
 }
 

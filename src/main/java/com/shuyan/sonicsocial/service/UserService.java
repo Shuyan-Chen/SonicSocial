@@ -1,25 +1,17 @@
 package com.shuyan.sonicsocial.service;
 
-import com.shuyan.dto.UserLoginDTO;
-import com.shuyan.dto.UserRegisterDTO;
-import com.shuyan.entity.Track;
-import com.shuyan.entity.User;
-import com.shuyan.result.Result;
 
-import java.util.List;
-import java.util.Map;
+import com.shuyan.sonicsocial.dto.UserLoginDto;
+import com.shuyan.sonicsocial.dto.UserRegisterDto;
+import com.shuyan.sonicsocial.result.Result;
 
 public interface UserService {
 
-    Result register(UserRegisterDTO userRegisterDTO);
+    Result register(UserRegisterDto userRegisterDto);
 
-    Result login(UserLoginDTO userLoginDTO);
+    Result login(UserLoginDto userLoginDto);
 
-    User checkToken(String token);
+    boolean isFirstLogin(long userId);
 
-    List<Track> getUserFavorites(String id, String accessToken);
 
-    User getById(long id);
-
-    Map<String, Object> analyzeUserMusicTaste(String userId, List<Track> tracks);
 }

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -13,28 +14,21 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "locations")
-public class Location {
-
+@Table(name = "user_tracks")
+public class UserTrack {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "FK_USER"))
     private User user;
 
-    @Column
-    private String location;
+    @ManyToOne
+    @JoinColumn(name = "track_id", foreignKey = @ForeignKey(name = "FK_TRACK"))
+    private Track track;
 
-    @Column
-    private double latitude;
-
-    @Column
-    private double longtitude;
-
-    @Column
-    private LocalDateTime timestamp;
-
+    @CreationTimestamp
+    private LocalDateTime addedAt;
 
 }

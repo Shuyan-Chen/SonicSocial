@@ -1,39 +1,48 @@
 package com.shuyan.sonicsocial.utils;
 
 
+import com.shuyan.sonicsocial.exception.InvalidCredentialsException;
 import io.jsonwebtoken.*;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 
+@Component
 public class JwtUtils {
 
-    private static final String jwtToken = "1234567890p[]l;'";
+    private final String JWT_SECRET = "234567890p[]l;";
+    private final long JWT_EXPIRATION = 604800000L;
 
-    public static String createToken(Long userId) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", userId);
-        JwtBuilder jwtBuilder = Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 60 * 1000))
-                .signWith(SignatureAlgorithm.HS256, jwtToken);
-        String token = jwtBuilder.compact();
-        return token;
+    public String generateToken(Long userId) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + JWT_EXPIRATION);
+
+        return Jwts.builder()
+                .setSubject(Long.toString(userId))
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .signWith(SignatureAlgorithm.HS512, JWT_SECRET)
+                .compact();
     }
 
-    public static Map<String, Object> checkToken(String token) {
+
+    public Long getUserIdFromJWT(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(JWT_SECRET)
+                .parseClaimsJws(token)
+                .getBody();
+        return Long.parseLong(claims.getSubject());
+    }
+
+    public boolean validateToken(String authToken) {
         try {
-            Jwt parse = Jwts.parser().setSigningKey(jwtToken).parse(token);
-            return (Map<String, Object>) parse.getBody();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            Jwts.parser().setSigningKey(JWT_SECRET).parseClaimsJws(authToken);
+            return true;
+        } catch (Exception ex) {
+            throw new InvalidCredentialsException("invalid token");
         }
     }
-
 
 
 }

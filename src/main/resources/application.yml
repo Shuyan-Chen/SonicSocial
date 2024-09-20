@@ -5,19 +5,18 @@ spring:
   profiles:
     active: dev
   main:
-    allow-circular-references: true
+    allow-circular-references: false
 
   datasource:
-    druid:
-      driver-class-name: ${vibe.datasource.driver-class-name}
-      url: jdbc:mysql://${vibe.datasource.host}:${vibe.datasource.port}/${vibe.datasource.database}?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
-      username: ${vibe.datasource.username}
-      password: ${vibe.datasource.password}
+    driver-class-name: ${sonic.datasource.driver-class-name}
+    url: jdbc:mysql://${sonic.datasource.host}:${sonic.datasource.port}/${sonic.datasource.database}?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+    username: ${sonic.datasource.username}
+    password: ${sonic.datasource.password}
 
     redis:
-      host: ${vibe.redis.host}
-      port: ${vibe.redis.port}
-      database: ${vibe.redis.database}
+      host: ${sonic.redis.host}
+      port: ${sonic.redis.port}
+      database: ${sonic.redis.database}
 
   jpa:
     hibernate:
@@ -27,4 +26,6 @@ spring:
       hibernate:
         format_sql: true
 
-
+google:
+  recaptcha:
+    secret: ${sonic.google.recaptcha.secret}
